@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Fusion Tables Layer Example: Basic JSONP Request</title>
+
+    <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script type="text/javascript">
+      function initialize() {
+        var query = "SELECT 'name', coordinate, dpcapacity FROM " +
+            '1GIyrdeRkBzl1CeAxpyN-Do-VGiJZljkYP7Mhxh4';
+        var encodedQuery = encodeURIComponent(query);
+
+        // Construct the URL
+        var url_station = ['https://www.googleapis.com/fusiontables/v1/query'];
+        url_station.push('?sql=' + encodedQuery);
+        url_station.push('&key=AIzaSyCfxjlK5hmC-RHZiYXU21acYxZVu3HqbKA');
+        url_station.push('&callback=?');
+
+        // Send the JSONP request using jQuery
+        $.ajax({
+          url: url_station.join(''),
+          dataType: 'jsonp',
+          success: function (data) {
+            var rows = data['rows'];
+            for (var i in rows) {
+			  var name = rows[i][0];
+              var coordinate = rows[i][1];
+			  var capacity = rows[i][2];
+			  queryArea(name,coordinate,capacity);
+            }
+          }
+        });
+      }
+	  
+	  function queryArea(divvy,latlng,cap) {
+        var query_area = "SELECT 'name' FROM " +
+            '1Q51hFHbundHzH1rNpbtXIortRPSDiFHDY4ylWnQ' +
+			" WHERE ST_INTERSECTS('geometry', CIRCLE(LATLNG(" + latlng + "), 0.00001))";
+        var encodedQuery_area = encodeURIComponent(query_area);
+
+        // Construct the URL
+        var url_area = ['https://www.googleapis.com/fusiontables/v1/query'];
+        url_area.push('?sql=' + encodedQuery_area);
+        url_area.push('&key=AIzaSyCfxjlK5hmC-RHZiYXU21acYxZVu3HqbKA');
+        url_area.push('&callback=?');
+
+        // Send the JSONP request using jQuery
+        $.ajax({
+			url: url_area.join(''),
+			dataType: 'jsonp',
+			success: function (data) {
+				var area = data['rows'];
+				var txt = divvy + " | " + latlng + " | " + area + " | " + cap + "<br>";
+				$("#ft-data").append(txt);
+			}
+		});
+	  }
+	  
+    </script>
+  </head>
+  <body onload="initialize()">
+    <div id="ft-data"></div>
+  </body>
+</html>

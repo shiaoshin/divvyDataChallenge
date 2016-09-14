@@ -1,0 +1,82 @@
+﻿<html>
+  <head>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.2&sensor=false&region=US"></script>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+		var map, layer;
+		var geocoder = new google.maps.Geocoder();
+		var table_station = '1GIyrdeRkBzl1CeAxpyN-Do-VGiJZljkYP7Mhxh4';
+		var table_area = '1537DTFm7LTctKT8PEpvisjcv-C-lPoeJ67orEw0';
+		var api = 'AIzaSyCfxjlK5hmC-RHZiYXU21acYxZVu3HqbKA';
+		var test_cor = '41.869417,-87.660996';
+
+		google.load('visualization', '1');
+
+		function initialize() {
+			alert('?')
+			var options = {
+				center: new google.maps.LatLng(41.8337329,-87.7321554),
+				zoom: 11,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+
+			map = new google.maps.Map(document.getElementById('map_canvas'), options);
+
+			layer = new google.maps.FusionTablesLayer({
+				query: {
+					select: "'geometry'",
+					from: table_area
+				},
+				map: map
+			});
+			
+			//window.onkeypress = enterSubmit;
+			getStation;
+		}
+		
+		function getStation() {
+			if (status == google.maps.GeocoderStatus.OK) { 
+				alert('getstation');
+				
+				var queryText = encodeURIComponent("SELECT 'name' FROM " + table_station;
+				var query = new google.visualization.Query(
+				  'http://www.google.com/fusiontables/gvizdata?tq=' + queryText);
+				query.send(showName);
+				}
+			}
+		}
+
+		/*function findStore(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {        
+				var coordinate = results[0].geometry.location;
+
+			marker = new google.maps.Marker({
+				map: map,
+				layer: layer,
+				animation: google.maps.Animation.DROP,
+				position: coordinate
+			});
+
+			var queryText = encodeURIComponent("SELECT 'name' FROM " + table_station;
+			var query = new google.visualization.Query(
+              'http://www.google.com/fusiontables/gvizdata?tq=' + queryText);
+			query.send(showName);
+			}
+		}*/
+
+		function showName(response) {
+			if(response.getDataTable().getNumberOfRows()) {
+				alert('tes');
+				var name = response.getDataTable().getValue(0, 0);
+				alert('Neighborhood: ' + name);
+			}
+		}
+    </script>
+  </head>
+  <body onload="initialize()">
+    <input type="text" value="?" id="address">
+    <input type="button" onclick="geocode()" value="Go">
+    <div id="map_canvas" style="width:940; height:800"></div>
+	<div id="listStations"></div>
+  </body>
+</html>
